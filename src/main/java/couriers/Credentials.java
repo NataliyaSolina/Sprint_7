@@ -27,4 +27,8 @@ public class Credentials {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public static Credentials from(Courier courier) {
+        return new Credentials(courier.getLogin(), courier.getPassword());
+    }
 }

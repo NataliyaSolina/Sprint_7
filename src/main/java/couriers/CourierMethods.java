@@ -4,6 +4,7 @@ import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
@@ -27,7 +28,7 @@ public class CourierMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(201)
+                .statusCode(SC_CREATED)
                 .and()
                 .body("ok", is(true));
     }
@@ -37,7 +38,7 @@ public class CourierMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(409)
+                .statusCode(SC_CONFLICT)
                 .and()
                 .body("message", equalTo("Этот логин уже используется"));
     }
@@ -47,7 +48,7 @@ public class CourierMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для создания учетной записи"));
     }
@@ -70,7 +71,7 @@ public class CourierMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .and()
                 .body("id", notNullValue());
         return response
@@ -82,7 +83,7 @@ public class CourierMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .and()
                 .body("message", equalTo("Учетная запись не найдена"));
     }
@@ -92,41 +93,51 @@ public class CourierMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
 
     @Step("Send DELETE request to /api/v1/courier/{courierId}")
-    public Response requestDeleteCourier(int courierId) {
-        Response response =
-                given()
+    public Response requestDeleteCourier(Integer courierId) {
+        Response response;
+        if (courierId != null) {
+            response =
+                    given()
+//                        .spec()
 //                        .log().all()
-                        .header("Content-type", "application/json")
-                        .when()
-                        .pathParams("courierId", courierId)
-                        .delete("/api/v1/courier/{courierId}");
+                            .header("Content-type", "application/json")
+                            .when()
+                            .pathParams("courierId", courierId)
+                            .delete("/api/v1/courier/{courierId}");
+        } else {
+            response =
+                    given()
+                            .header("Content-type", "application/json")
+                            .when()
+                            .delete("/api/v1/courier/");
+        }
         System.out.println("requestDeleteCourier " + response.body().asString());
         return response;
     }
 
-    @Step("Send DELETE request to /api/v1/courier")
-    public Response requestDeleteCourierWithoutParams() {
-        Response response =
-                given()
-                        .header("Content-type", "application/json")
-                        .when()
-                        .delete("/api/v1/courier/");
-        System.out.println("requestDeleteCourier " + response.body().asString());
-        return response;
-    }
+//    @Step("Send DELETE request to /api/v1/courier")
+//    public Response requestDeleteCourierWithoutParams() {
+//        Response response =
+//                given()
+//                        .header("Content-type", "application/json")
+//                        .when()
+//                        .delete("/api/v1/courier/");
+//        System.out.println("requestDeleteCourier " + response.body().asString());
+//        return response;
+//    }
 
     @Step("Receive DELETE response Ok to /api/v1/courier/{courierId}")
     public void responseDeleteCourierOk(Response response) {
         response
                 .then()
                 .assertThat()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .and()
                 .body("ok", is(true));
     }
@@ -136,7 +147,7 @@ public class CourierMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для удаления курьера"));
     }
@@ -146,7 +157,7 @@ public class CourierMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .and()
                 .body("message", equalTo("Курьера с таким id нет"));
     }

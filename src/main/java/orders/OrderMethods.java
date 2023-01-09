@@ -4,6 +4,7 @@ import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
@@ -28,7 +29,7 @@ public class OrderMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(201)
+                .statusCode(SC_CREATED)
                 .and()
                 .body("track", notNullValue());
         return response
@@ -50,7 +51,7 @@ public class OrderMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .and()
                 .body("orders", notNullValue())
                 .body("orders.id[0]", notNullValue())
@@ -76,7 +77,7 @@ public class OrderMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .and()
                 .body("order.id", notNullValue());             //TODO check all body
         return response
@@ -88,7 +89,7 @@ public class OrderMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для поиска"));
     }
@@ -98,40 +99,49 @@ public class OrderMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .and()
                 .body("message", equalTo("Заказ не найден"));
     }
 
     @Step("Send PUT request to /api/v1/orders/accept/{orderId}")
     public Response requestAcceptOrderById(Integer orderId, Integer courierId) {
-        Response response =
-                given()
-                        .header("Content-type", "application/json")
-                        .pathParam("orderId", orderId)
-                        .queryParam("courierId", courierId)
-                        .put("/api/v1/orders/accept/{orderId}");
+        Response response;
+        if (orderId != null) {
+            response =
+                    given()
+                            .header("Content-type", "application/json")
+                            .pathParam("orderId", orderId)
+                            .queryParam("courierId", courierId)
+                            .put("/api/v1/orders/accept/{orderId}");
+        } else {
+            response =
+                    given()
+                            .header("Content-type", "application/json")
+                            .queryParam("courierId", courierId)
+                            .put("/api/v1/orders/accept");
+        }
         System.out.println("requestAcceptOrderById " + response.body().asString());
         return response;
     }
 
-    @Step("Send PUT request to /api/v1/orders/accept/{orderId}")
-    public Response requestAcceptOrderByIdWithoutOrderId(Integer courierId) {
-        Response response =
-                given()
-                        .header("Content-type", "application/json")
-                        .queryParam("courierId", courierId)
-                        .put("/api/v1/orders/accept");
-        System.out.println("requestAcceptOrderById " + response.body().asString());
-        return response;
-    }
+//    @Step("Send PUT request to /api/v1/orders/accept/{orderId}")
+//    public Response requestAcceptOrderByIdWithoutOrderId(Integer courierId) {
+//        Response response =
+//                given()
+//                        .header("Content-type", "application/json")
+//                        .queryParam("courierId", courierId)
+//                        .put("/api/v1/orders/accept");
+//        System.out.println("requestAcceptOrderById " + response.body().asString());
+//        return response;
+//    }
 
     @Step("Receive PUT response Ok to /api/v1/orders/accept/{orderId}")
     public void responseAcceptOrderByIdOk(Response response) {
         response
                 .then()
                 .assertThat()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .and()
                 .body("ok", is(true));
     }
@@ -141,7 +151,7 @@ public class OrderMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .and()
                 .body("message", equalTo("Курьера с таким id не существует"));
     }
@@ -151,7 +161,7 @@ public class OrderMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .and()
                 .body("message", equalTo("Заказа с таким id не существует"));
     }
@@ -161,9 +171,8 @@ public class OrderMethods {
         response
                 .then()
                 .assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для поиска"));
     }
-
 }
