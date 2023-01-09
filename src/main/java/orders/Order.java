@@ -2,7 +2,7 @@ package orders;
 
 import java.util.List;
 
-public class OrderClient {
+public class Order {
     private String firstName;
     private String lastName;
     private String address;
@@ -13,7 +13,7 @@ public class OrderClient {
     private String comment;
     private List<Color> color;
 
-    public OrderClient(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, List<Color> color) {
+    public Order(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, List<Color> color) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -25,7 +25,7 @@ public class OrderClient {
         this.color = color;
     }
 
-    public OrderClient() {
+    public Order() {
     }
 
     public String getFirstName() {

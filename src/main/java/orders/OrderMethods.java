@@ -11,12 +11,12 @@ import static org.hamcrest.core.Is.is;
 public class OrderMethods {
 
     @Step("Send POST request to /api/v1/orders")
-    public Response requestCreateOrder(OrderClient orderClient) {
+    public Response requestCreateOrder(Order order) {
         Response response =
                 given()
                         .header("Content-type", "application/json")
                         .and()
-                        .body(orderClient)
+                        .body(order)
                         .when()
                         .post("/api/v1/orders");
         System.out.println("requestCreateOrder " + response.body().asString());
@@ -57,7 +57,7 @@ public class OrderMethods {
                 .body("orders.id[1]", notNullValue())
                 .body("orders.id[29]", notNullValue())
                 .body("orders.track[0]", notNullValue())
-                .body("orders.status[0]", notNullValue());
+                .body("orders.status[0]", notNullValue());      //TODO check all body
     }
 
     @Step("Send GET request to /api/v1/orders/track")
@@ -78,7 +78,7 @@ public class OrderMethods {
                 .assertThat()
                 .statusCode(200)
                 .and()
-                .body("order.id", notNullValue());      //TODO check all body
+                .body("order.id", notNullValue());             //TODO check all body
         return response
                 .path("order.id");
     }

@@ -111,7 +111,7 @@ public class CourierMethods {
     }
 
     @Step("Send DELETE request to /api/v1/courier")
-    public Response requestDeleteCourier() {
+    public Response requestDeleteCourierWithoutParams() {
         Response response =
                 given()
                         .header("Content-type", "application/json")
