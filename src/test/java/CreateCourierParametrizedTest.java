@@ -9,6 +9,8 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class CreateCourierParametrizedTest {
+    CourierMethods method = new CourierMethods();
+    Response response;
     private final String login;
     private final String password;
 
@@ -17,11 +19,13 @@ public class CreateCourierParametrizedTest {
         this.password = password;
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "creds - {0}, {1}")
     public static Object[][] getTextData() {
         return new Object[][]{
                 {null, "2611"},
-                {"Tasha", null}
+                {"", "2611"},
+                {"Tasha", null},
+                {"Tasha", ""}
         };
     }
 
@@ -33,11 +37,9 @@ public class CreateCourierParametrizedTest {
     @Test
     @Description("1.6 если одного из полей нет, запрос возвращает ошибку")
     public void createCourierMissingRequiredFieldTest() {
-        CourierMethods method = new CourierMethods();
         Courier courier = new Courier(login, password, "Tasha");
-        Response response;
 
         response = method.requestCreateCourier(courier);
-        method.responseCreateCourierErrorMissing(response);              //проверка ответа ERROR
+        method.responseCreateCourierErrorMissing(response);
     }
 }

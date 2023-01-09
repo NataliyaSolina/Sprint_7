@@ -3,6 +3,7 @@ import io.qameta.allure.Description;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +11,10 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class AuthCourierParametrizedTest {
+    CourierMethods method = new CourierMethods();
+    Credentials cred;
+    Response response;
+    int courierId;
     private final String login;
     private final String password;
     private final String loginCred;
@@ -24,14 +29,16 @@ public class AuthCourierParametrizedTest {
         this.methodParam = methodParam;
     }
 
-    @Parameterized.Parameters(name ="creds - {2}, {3}")
+    @Parameterized.Parameters(name = "creds - {2}, {3}")
     public static Object[][] getTextData() {
         return new Object[][]{
                 {"Tasha", "2611", "Tasha", "2611", "Ok"},
                 {"Tasha", "2611", "Tasha_" + RandomStringUtils.randomAlphabetic(3), "2611", "NotFound"},
                 {"Tasha", "2611", "Tasha", RandomStringUtils.randomNumeric(4), "NotFound"},
                 {"Tasha", "2611", null, "2611", "Missing"},
-                {"Tasha", "2611", "Tasha", null, "Missing"}
+                {"Tasha", "2611", "", "2611", "Missing"},
+                {"Tasha", "2611", "Tasha", null, "Missing"},
+                {"Tasha", "2611", "Tasha", "", "Missing"}
         };
     }
 
@@ -40,18 +47,23 @@ public class AuthCourierParametrizedTest {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
     }
 
+    @After
+    public void cleanUp() {
+        response = method.requestAuthCourier(cred);                             //After удаление за собой если есть
+        if (response.statusCode() == 200) {
+            courierId = method.responseAuthCourierOk(response);
+            method.requestDeleteCourier(courierId);
+        }
+    }
+
     @Test
     @Description("2.1 курьер может авторизоваться, 2.2 для авторизации нужно передать все обязательные поля, 2.3 система вернёт ошибку, если неправильно указать логин или пароль, 2.4 если какого-то поля нет, запрос возвращает ошибку, 2.5 если авторизоваться под несуществующим пользователем, запрос возвращает ошибку, 2.6 успешный запрос возвращает id")
     public void authCourierTest() {
         Courier courier = new Courier(login, password, "Tasha");
-        Credentials cred = new Credentials(courier.getLogin(), courier.getPassword());
+        cred = Credentials.from(courier);
         Credentials credCheck = new Credentials(loginCred, passwordCred);
-        CourierMethods method = new CourierMethods();
-        Response response;
-        int courierId;
 
         method.requestCreateCourier(courier);                                   //Before создание
-
 
         response = method.requestAuthCourier(credCheck);
         switch (methodParam) {
@@ -64,14 +76,6 @@ public class AuthCourierParametrizedTest {
             case "Missing":
                 method.responseAuthCourierErrorMissing(response);                   //ошибка авторизации БАХХХХ статускод 504 (ожид 400) при отсутствии пароля
                 break;
-        }
-
-
-        response = method.requestAuthCourier(cred);                             //After удаление за собой если есть
-        if (response.statusCode() == 200) {
-            courierId = method.responseAuthCourierOk(response);
-            response = method.requestDeleteCourier(courierId);
-            method.responseDeleteCourierOk(response);
         }
     }
 }
