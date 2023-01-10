@@ -1,22 +1,19 @@
 import io.qameta.allure.Description;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import orders.Order;
-import orders.OrderGen;
-import orders.OrderMethods;
+import org.example.orders.*;
 import org.junit.Before;
 import org.junit.Test;
 
 public class GetOrderByTrackTest {
     OrderMethods method = new OrderMethods();
     OrderGen generator = new OrderGen();
-    Order order = generator.random();
+    Order order;
     Response response;
     int track;
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
+        order = generator.random();
 
         response = method.requestCreateOrder(order);
         track = method.responseCreateOrderOk(response);

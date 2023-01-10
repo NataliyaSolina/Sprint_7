@@ -1,7 +1,6 @@
 import io.qameta.allure.Description;
-import orders.*;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.example.orders.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +12,7 @@ import java.util.List;
 public class CreateOrderParametrizedTest {
     OrderMethods method = new OrderMethods();
     OrderGen generator = new OrderGen();
+    Order order;
     Response response;
     List<Color> color;
 
@@ -32,14 +32,12 @@ public class CreateOrderParametrizedTest {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
+        order = generator.randomWithColor(color);
     }
 
     @Test
     @Description("3.1 можно указать один из цветов — BLACK или GREY, 3.2 можно указать оба цвета, 3.3 можно совсем не указывать цвет, 3.4 тело ответа содержит track")
     public void createCourierValidDataRezultOk() {
-        Order order = generator.randomWhithoutColor(color);
-
         response = method.requestCreateOrder(order);
         method.responseCreateOrderOk(response);
     }

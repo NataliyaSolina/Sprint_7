@@ -1,13 +1,7 @@
-import couriers.Courier;
-import couriers.CourierGen;
-import couriers.CourierMethods;
-import couriers.Credentials;
 import io.qameta.allure.Description;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import orders.Order;
-import orders.OrderGen;
-import orders.OrderMethods;
+import org.example.couriers.*;
+import org.example.orders.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,10 +10,10 @@ public class AcceptOrderTest {
     CourierMethods methodCour = new CourierMethods();
     OrderMethods methodOrder = new OrderMethods();
     CourierGen generatorCour = new CourierGen();
-    Courier courier = generatorCour.random();
-    Credentials cred = Credentials.from(courier);
+    Courier courier;
+    Credentials cred;
     OrderGen generatorOrder = new OrderGen();
-    Order order = generatorOrder.random();
+    Order order;
     Response response;
     int courierId;
     int orderId;
@@ -27,7 +21,9 @@ public class AcceptOrderTest {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
+        courier = generatorCour.random();
+        cred = Credentials.from(courier);
+        order = generatorOrder.random();
 
         methodCour.requestCreateCourier(courier);                           //создать курьера
         response = methodCour.requestAuthCourier(cred);

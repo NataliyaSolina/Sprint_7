@@ -1,10 +1,6 @@
-import couriers.Courier;
-import couriers.CourierGen;
-import couriers.CourierMethods;
-import couriers.Credentials;
 import io.qameta.allure.Description;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.example.couriers.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,14 +8,16 @@ import org.junit.Test;
 public class DeleteCourierTest {
     CourierMethods method = new CourierMethods();
     CourierGen generator = new CourierGen();
-    Courier courier = generator.random();
-    Credentials cred = Credentials.from(courier);
+    Courier courier;
+    Credentials cred;
     Response response;
     int courierId;
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
+        courier = generator.random();
+        cred = Credentials.from(courier);
+
         method.requestCreateCourier(courier);
         response = method.requestAuthCourier(cred);
         courierId = method.responseAuthCourierOk(response);
