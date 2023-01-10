@@ -1,25 +1,26 @@
-package orders;
+package org.example.orders;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import org.example.SettingsRequest;
 
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.*;
 
-public class OrderMethods {
+public class OrderMethods extends SettingsRequest {
 
     @Step("Send POST request to /api/v1/orders")
     public Response requestCreateOrder(Order order) {
         Response response =
                 given()
-                        .header("Content-type", "application/json")
+                        .spec(getSpec())
                         .and()
                         .body(order)
                         .when()
-                        .post("/api/v1/orders");
+                        .post("/orders");
         System.out.println("requestCreateOrder " + response.body().asString());
         return response;
     }
@@ -31,7 +32,7 @@ public class OrderMethods {
                 .assertThat()
                 .statusCode(SC_CREATED)
                 .and()
-                .body("track", notNullValue());
+                .body("track", greaterThan(0));
         return response
                 .path("track");
     }
@@ -40,8 +41,9 @@ public class OrderMethods {
     public Response requestListOrdersWithoutParams() {
         Response response =
                 given()
-                        .header("Content-type", "application/json")
-                        .get("/api/v1/orders");
+                        .spec(getSpec())
+                        .when()
+                        .get("/orders");
         System.out.println("requestListOrderWithoutParams " + response.body().asString());
         return response;
     }
@@ -54,21 +56,31 @@ public class OrderMethods {
                 .statusCode(SC_OK)
                 .and()
                 .body("orders", notNullValue())
-                .body("orders.id[0]", notNullValue())
-                .body("orders.id[1]", notNullValue())
-                .body("orders.id[29]", notNullValue())
-                .body("orders.track[0]", notNullValue())
+                .body("orders.id[0]", greaterThan(0))
+                .body("orders.id[1]", greaterThan(0))
+                .body("orders.id[29]", greaterThan(0))
+                .body("orders.track[0]", greaterThan(0))
                 .body("orders.status[0]", notNullValue());      //TODO check all body
     }
 
     @Step("Send GET request to /api/v1/orders/track")
     public Response requestGetOrderByTrack(Integer track) {
-        Response response =
-                given()
-                        .header("Content-type", "application/json")
-                        .queryParam("t", track)
-                        .get("/api/v1/orders/track");
-        System.out.println("requestGetOrderByTrack " + response.body().asString());
+        Response response;
+        if (track != null) {
+            response =
+                    given()
+                            .spec(getSpec())
+                            .queryParam("t", track)
+                            .when()
+                            .get("/orders/track");
+            System.out.println("requestGetOrderByTrack " + response.body().asString());
+        } else {
+            response =
+                    given()
+                            .spec(getSpec())
+                            .when()
+                            .get("/orders/track");
+        }
         return response;
     }
 
@@ -79,7 +91,7 @@ public class OrderMethods {
                 .assertThat()
                 .statusCode(SC_OK)
                 .and()
-                .body("order.id", notNullValue());             //TODO check all body
+                .body("order.id", greaterThan(0));             //TODO check all body
         return response
                 .path("order.id");
     }
@@ -110,31 +122,22 @@ public class OrderMethods {
         if (orderId != null) {
             response =
                     given()
-                            .header("Content-type", "application/json")
+                            .spec(getSpec())
                             .pathParam("orderId", orderId)
                             .queryParam("courierId", courierId)
-                            .put("/api/v1/orders/accept/{orderId}");
+                            .when()
+                            .put("/orders/accept/{orderId}");
         } else {
             response =
                     given()
-                            .header("Content-type", "application/json")
+                            .spec(getSpec())
                             .queryParam("courierId", courierId)
-                            .put("/api/v1/orders/accept");
+                            .when()
+                            .put("/orders/accept");
         }
         System.out.println("requestAcceptOrderById " + response.body().asString());
         return response;
     }
-
-//    @Step("Send PUT request to /api/v1/orders/accept/{orderId}")
-//    public Response requestAcceptOrderByIdWithoutOrderId(Integer courierId) {
-//        Response response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .queryParam("courierId", courierId)
-//                        .put("/api/v1/orders/accept");
-//        System.out.println("requestAcceptOrderById " + response.body().asString());
-//        return response;
-//    }
 
     @Step("Receive PUT response Ok to /api/v1/orders/accept/{orderId}")
     public void responseAcceptOrderByIdOk(Response response) {

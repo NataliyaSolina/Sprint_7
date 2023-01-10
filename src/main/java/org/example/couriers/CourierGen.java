@@ -1,4 +1,4 @@
-package couriers;
+package org.example.couriers;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -8,6 +8,6 @@ public class CourierGen {
     }
 
     public Courier random() {
-        return new Courier(RandomStringUtils.randomAlphanumeric(6, 9), RandomStringUtils.randomAlphanumeric(4, 10), RandomStringUtils.randomAlphanumeric(3, 9));
+        return new Courier(RandomStringUtils.randomAlphanumeric(6, 9), RandomStringUtils.randomAlphanumeric(4, 10), RandomStringUtils.randomAlphabetic(3, 9));
     }
 }

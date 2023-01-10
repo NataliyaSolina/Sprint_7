@@ -1,24 +1,24 @@
-package couriers;
+package org.example.couriers;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import org.example.SettingsRequest;
 
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.*;
 
-public class CourierMethods {
+public class CourierMethods extends SettingsRequest {
     @Step("Send POST request to /api/v1/courier")
     public Response requestCreateCourier(Courier courier) {
         Response response =
                 given()
-                        .header("Content-type", "application/json")
+                        .spec(getSpec())
                         .and()
                         .body(courier)
                         .when()
-                        .post("/api/v1/courier");
+                        .post("/courier");
         System.out.println("requestCreateCourier " + response.body().asString());
         return response;
     }
@@ -57,11 +57,11 @@ public class CourierMethods {
     public Response requestAuthCourier(Credentials cred) {
         Response response =
                 given()
-                        .header("Content-type", "application/json")
+                        .spec(getSpec())
                         .and()
                         .body(cred)
                         .when()
-                        .post("/api/v1/courier/login");
+                        .post("/courier/login");
         System.out.println("requestAuthCourier " + response.body().asString());
         return response;
     }
@@ -73,7 +73,7 @@ public class CourierMethods {
                 .assertThat()
                 .statusCode(SC_OK)
                 .and()
-                .body("id", notNullValue());
+                .body("id", greaterThan(0));
         return response
                 .path("id");
     }
@@ -104,33 +104,20 @@ public class CourierMethods {
         if (courierId != null) {
             response =
                     given()
-//                        .spec()
-//                        .log().all()
-                            .header("Content-type", "application/json")
+                            .spec(getSpec())
                             .when()
                             .pathParams("courierId", courierId)
-                            .delete("/api/v1/courier/{courierId}");
+                            .delete("/courier/{courierId}");
         } else {
             response =
                     given()
-                            .header("Content-type", "application/json")
+                            .spec(getSpec())
                             .when()
-                            .delete("/api/v1/courier/");
+                            .delete("/courier/");
         }
         System.out.println("requestDeleteCourier " + response.body().asString());
         return response;
     }
-
-//    @Step("Send DELETE request to /api/v1/courier")
-//    public Response requestDeleteCourierWithoutParams() {
-//        Response response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .when()
-//                        .delete("/api/v1/courier/");
-//        System.out.println("requestDeleteCourier " + response.body().asString());
-//        return response;
-//    }
 
     @Step("Receive DELETE response Ok to /api/v1/courier/{courierId}")
     public void responseDeleteCourierOk(Response response) {
