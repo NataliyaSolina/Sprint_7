@@ -19,7 +19,7 @@ public class CreateCourierParametrizedTest {
         this.password = password;
     }
 
-    @Parameterized.Parameters(name = "creds - {0}, {1}")
+    @Parameterized.Parameters(name = "courier - {0}, {1}")
     public static Object[][] getTextData() {
         return new Object[][]{
                 {null, "2611"},

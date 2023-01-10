@@ -31,7 +31,7 @@ public class AuthCourierInvalidDataParametrizedTest {
     @Parameterized.Parameters(name = "creds - {2}, {3}")
     public static Object[][] getTextData() {
         return new Object[][]{
-                {"Tasha", "2611", RandomStringUtils.randomAlphabetic(3), "2611"},
+                {"Tasha", "2611", RandomStringUtils.randomAlphabetic(5), "2611"},
                 {"Tasha", "2611", "Tasha_" + RandomStringUtils.randomAlphabetic(3), "2611"},
                 {"Tasha", "2611", "Tasha", RandomStringUtils.randomAlphabetic(4)}
         };

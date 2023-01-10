@@ -34,6 +34,6 @@ public class AuthCourierTest {
     @Description("2.1 курьер может авторизоваться, 2.2 для авторизации нужно передать все обязательные поля, 2.6 успешный запрос возвращает id")
     public void authCourierTest() {
         response = method.requestAuthCourier(cred);
-         method.responseAuthCourierOk(response);
+        method.responseAuthCourierOk(response);
     }
 }

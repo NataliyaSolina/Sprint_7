@@ -42,7 +42,7 @@ public class DeleteCourierTest {
     @Test
     @Description("d1.1 неуспешный запрос возвращает соответствующую ошибку, d1.3 если отправить запрос без id, вернётся ошибка")
     public void deleteCourierMissingDataRezultErrorMissing() {
-        response = method.requestDeleteCourier(courierId);
+        response = method.requestDeleteCourier(null);
         method.responseDeleteCourierWithoutParamsErrorMissing(response);                   //проверка ответа БАХХХХ статускод 404 message = Not Found. (по тз 400 message = Недостаточно данных для удаления курьера)
     }
 

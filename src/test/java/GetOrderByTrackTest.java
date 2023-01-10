@@ -24,6 +24,7 @@ public class GetOrderByTrackTest {
     public void getOrderByTrackValidDataRezultOk() {
         response = method.requestGetOrderByTrack(track);
         method.responseGetOrderByTrackOk(response);
+        method.responseGetOrderByTrackCheckOrder(response, track, order);           //именно тот заказ который создался БАХХХХ плавающий, иногда-часто (не понятно когда) возвращается не тот заказ (трек тот заказ не тот), т е возвращается не тот трек
     }
 
     @Test
@@ -35,9 +36,15 @@ public class GetOrderByTrackTest {
 
     @Test
     @Description("d3.3 запрос с несуществующим заказом возвращает ошибку")
+    public void getOrderByTrackZeroTrackErrorNotFound() {
+        response = method.requestGetOrderByTrack(0);
+        method.responseGetOrderByTrackErrorNotFound(response);
+    }
+
+    @Test
+    @Description("d3.3 запрос с несуществующим заказом возвращает ошибку")
     public void getOrderByTrackInvalidTrackErrorNotFound() {
         response = method.requestGetOrderByTrack((int) (Math.random() * (Integer.MAX_VALUE) + 1));      //пальцем в небо не факт что не попадет в рабочий - придумать что-то
-//        response = method.requestGetOrderByTrack(0);
         method.responseGetOrderByTrackErrorNotFound(response);
     }
 }
