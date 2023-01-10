@@ -14,10 +14,10 @@ public class OrderGen {
     public Order random() {
         List<Color>[] color = new List[]{List.of(Color.GREY, Color.BLACK), List.of(Color.GREY), List.of(Color.BLACK), null};
         int randomColor = new Random().nextInt(color.length);
-        return new Order(RandomStringUtils.randomAlphanumeric(6, 9), RandomStringUtils.randomAlphanumeric(4, 10), RandomStringUtils.randomAlphanumeric(9, 20), "" + (int) (Math.random() * (237) + 1), "+7" + RandomStringUtils.randomNumeric(10), (int) (Math.random() * 9), "2023-01-07", "Без комментариев", color[randomColor]);
+        return new Order(RandomStringUtils.randomAlphanumeric(6, 9), RandomStringUtils.randomAlphanumeric(4, 10), RandomStringUtils.randomAlphanumeric(9, 20), "" + (int) (Math.random() * (237) + 1), "+7" + RandomStringUtils.randomNumeric(10), (int) (Math.random() * 9 + 1), "2023-01-07", "Без комментариев", color[randomColor]);
     }
 
     public Order randomWithColor(List<Color> color) {
-        return new Order(RandomStringUtils.randomAlphanumeric(6, 9), RandomStringUtils.randomAlphanumeric(4, 10), RandomStringUtils.randomAlphanumeric(9, 20), "" + (int) (Math.random() * (237) + 1), "+7" + RandomStringUtils.randomNumeric(10), (int) (Math.random() * 9), "2023-01-07", "Без комментариев", color);
+        return new Order(RandomStringUtils.randomAlphanumeric(6, 9), RandomStringUtils.randomAlphanumeric(4, 10), RandomStringUtils.randomAlphanumeric(9, 20), "" + (int) (Math.random() * (237) + 1), "+7" + RandomStringUtils.randomNumeric(10), (int) (Math.random() * 9 + 1), "2023-01-07", "Без комментариев", color);
     }
 }

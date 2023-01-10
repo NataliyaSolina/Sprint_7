@@ -5,10 +5,12 @@ import io.restassured.response.Response;
 import org.example.SettingsRequest;
 
 import static io.restassured.RestAssured.given;
+import static java.util.Objects.nonNull;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
 
 public class OrderMethods extends SettingsRequest {
 
@@ -56,11 +58,15 @@ public class OrderMethods extends SettingsRequest {
                 .statusCode(SC_OK)
                 .and()
                 .body("orders", notNullValue())
+                .body("orders.id[0]", notNullValue())
                 .body("orders.id[0]", greaterThan(0))
+                .body("orders.id[1]", notNullValue())
                 .body("orders.id[1]", greaterThan(0))
+                .body("orders.id[29]", notNullValue())
                 .body("orders.id[29]", greaterThan(0))
+                .body("orders.track[0]", notNullValue())
                 .body("orders.track[0]", greaterThan(0))
-                .body("orders.status[0]", notNullValue());      //TODO check all body
+                .body("orders.status[0]", notNullValue());
     }
 
     @Step("Send GET request to /api/v1/orders/track")
@@ -91,9 +97,44 @@ public class OrderMethods extends SettingsRequest {
                 .assertThat()
                 .statusCode(SC_OK)
                 .and()
-                .body("order.id", greaterThan(0));             //TODO check all body
+                .body("order", notNullValue())
+                .body("order.id", notNullValue())
+                .body("order.id", greaterThan(0))
+                .body("order.track", notNullValue())
+                .body("order.track", greaterThan(0));
         return response
                 .path("order.id");
+    }
+
+    @Step("Receive GET response Ok to /api/v1/orders/track")
+    public void responseGetOrderByTrackCheckOrder(Response response, Integer track, Order order) {
+        response
+                .then()
+                .assertThat()
+                .body("order.id", greaterThan(0))
+                .body("order.firstName", equalTo(order.getFirstName()))
+                .body("order.lastName", equalTo(order.getLastName()))
+                .body("order.address", equalTo(order.getAddress()))
+                .body("order.metroStation", equalTo(order.getMetroStation()))
+                .body("order.phone", equalTo(order.getPhone()))
+                .body("order.rentTime", equalTo(order.getRentTime()))
+                .body("order.deliveryDate", containsString(order.getDeliveryDate()))
+                .body("order.track", equalTo(track))
+                .body("order.comment", equalTo(order.getComment()))
+                .body("order.comment", equalTo(order.getComment()))
+                .body("order.comment", equalTo(order.getComment()))
+                .body("order.comment", equalTo(order.getComment()));
+        if (nonNull(order.getColor())) {
+            assertEquals(response
+                    .then()
+                    .extract()
+                    .path("order.color").toString(), (order.getColor().toString()));
+        } else {
+            response
+                    .then()
+                    .assertThat()
+                    .body("order.color", nullValue());
+        }
     }
 
     @Step("Receive GET response ErrorMissing to /api/v1/orders/track")
